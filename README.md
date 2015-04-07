@@ -6,7 +6,7 @@ SendWithUs PHP Client
 > Note: This fork is maintained for PSR2 compliance and proper composer compatibility.
 
 ## status
-[![Build Status](https://travis-ci.org/sendwithus/sendwithus_php.png)](https://travis-ci.org/sendwithus/sendwithus_php)
+[![Build Status](https://travis-ci.org/dbtlr/sendwithus_php.png)](https://travis-ci.org/dbtlr/sendwithus_php)
 
 ## requirements
     curl library must be installed and enabled in php.ini

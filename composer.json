@@ -2,6 +2,8 @@
     "name": "sendwithus/api",
     "description": "sendwithus.com PHP Client",
     "autoload": {
-        "classmap": ["lib"]
+      "psr-4": {
+        "SendWithUs\\Api\\": "src/"
+      }
     }
 }

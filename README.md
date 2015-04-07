@@ -1,7 +1,9 @@
 sendwithus_php
 ==============
 
-sendwithus PHP Client
+SendWithUs PHP Client
+
+> Note: This fork is maintained for PSR2 compliance and proper composer compatibility.
 
 ## status
 [![Build Status](https://travis-ci.org/sendwithus/sendwithus_php.png)](https://travis-ci.org/sendwithus/sendwithus_php)
@@ -18,7 +20,7 @@ Add it to your composer.json
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/sendwithus/sendwithus_php"
+            "url": "https://github.com/dbtlr/sendwithus_php"
         }
     ],
     "require": {
@@ -34,23 +36,15 @@ Then install it with
 ## Getting started
 
 ```php
-// Yii Users
-Yii::$classMap = array(
-    'sendwithus\\API' => dirname($_SERVER['DOCUMENT_ROOT']) . '/path/to/sendwithus/lib/API.php'
-);
-
-// composer users
-use sendwithus\API;
 
 require_once 'vendor/autoload.php';
 
-
-$API_KEY = 'THIS_IS_A_TEST_API_KEY';
+$apiKey = 'THIS_IS_A_TEST_API_KEY';
 $options = array(
-    'DEBUG' => true
+    'debugMode' => true
 );
 
-$api = new API($API_KEY, $options);
+$api = new \SendWithUs\Api\Client($apiKey, $options);
 ```
 
 # Emails
@@ -63,7 +57,7 @@ $response = $api->emails();
 
 ## Get specific template
 ```php
-$response = $api->get_template($template_id,     //string id of template
+$response = $api->getTemplate($template_id,     //string id of template
                                $version_id       //optional string version id of template
 );
 ```
@@ -73,7 +67,7 @@ $response = $api->get_template($template_id,     //string id of template
 ### Create new email
 _We validate all HTML content_
 ```php
-$response = $api->create_email('Email Name',               // string email name
+$response = $api->createEmail('Email Name',                // string email name
     'Email Subject',                                       // string subject line of email
     '<html><head></head><body>Valid HTML<body></html>',    // string of HTML code for email
     'Optional text content')                               // optional string of text for email
@@ -82,7 +76,7 @@ $response = $api->create_email('Email Name',               // string email name
 ### Create new email template version
 _We validate all HTML content_
 ```php
-$response = $api->create_new_template_version(
+$response = $api->createNewTemplateVersion(
     'Email Name',                                          // string email version name
     'Email Subject',                                       // string subject of email
 	'tem_JAksjdjwJXUVwnemljflksEJks',                      // string id of email used
@@ -93,7 +87,7 @@ $response = $api->create_new_template_version(
 ### Update email version
 _We validate all HTML content_
 ```php
-$response = $api->update_template_version(
+$response = $api->updateTemplateVersion(
     'Email Name',                                          // string email version name
     'Email Subject',                                       // string subject of email
 	'tem_JAkCjdjwJXUVwnemljflksEJks',                      // string id of email being updated
@@ -243,7 +237,7 @@ $response = $api->send('email_id',
 
 ## Send to a Segment
 ```php
-send_segment(
+$response = $api->sendSegment(
     $email_id,          // id of template to send
     $segment_id,        // id of the segment to send to
     $data               // optional array of data to send
@@ -253,12 +247,12 @@ send_segment(
 Example
 
 ```php
-$response = $api->send_segment(tem_123jeDI23, 'seg_0biVV4Ncf1234');
+$response = $api->sendSegment(tem_123jeDI23, 'seg_0biVV4Ncf1234');
 ```
 
 ## Get an Email Log
 ```php
-get_log(
+$response = $api->getLog(
     $log_id          // id of log to retrieve
 )
 ```
@@ -266,7 +260,7 @@ get_log(
 Example
 
 ```php
-$response = api->get_log('log_d4R7hV4d0r')
+$response = $response = $api->getLog('log_d4R7hV4d0r')
 ```
 
 Response
@@ -289,7 +283,7 @@ Response
 ## Drip Unsubscribe
 ```php
 // Unsubscribe email address from active drips
-drip_unsubscribe(
+$response = $api->dripUnsubscribe(
     $email_address,      // the email to unsubscribe from active drips
 )
 ```
@@ -297,7 +291,7 @@ drip_unsubscribe(
 ## Drip Unsubscribe Example
 
 ```php
-$response = $api->drip_unsubscribe('us@sendwithus.com');
+$response = $api->dripUnsubscribe('us@sendwithus.com');
 ```
 
 ## Drips 2.0
@@ -308,7 +302,7 @@ List all drip campaigns for the current profile
 Example
 
 ```php
-$response = $api->list_drip_campaigns();
+$response = $api->listDripCampaigns();
 ```
 
 Response
@@ -343,7 +337,7 @@ Array
 Starts a customer on the first step of a specified drip campaign
 
 ```php
-start_on_drip_campaign(
+$response = $api->startOnDripCampaign(
     $recipient_address, // string, email address being added to drip campaign
     $drip_campaign_id,  // string, drip campaign being added to
 	$data               // array, (optional) email data being added to drip campaign
@@ -370,7 +364,7 @@ $args = array(
     'tags' => array('all', 'the', 'tags'),
     'cc' => array('address' => 'them@sendwithus.com')
 );
-$response = $api->start_on_drip_campaign('us@sendwithus.com', 'dc_1234abcd1234', $email_data, $args);
+$response = $api->startOnDripCampaign('us@sendwithus.com', 'dc_1234abcd1234', $email_data, $args);
 ```
 
 Response
@@ -403,7 +397,7 @@ $response = $api->remove_from_drip_campaign(
 Example
 
 ```php
-$response = $api->remove_from_drip_campaign('us@sendwithus.com', 'dc_1234abcd1234');
+$response = $api->removeFromDripCampaign('us@sendwithus.com', 'dc_1234abcd1234');
 ```
 
 Response
@@ -427,7 +421,7 @@ stdClass Object
 ### List Drip Campaign Details
 Show all the steps and other information in a specified campaign
 ```php
-$response = $api->drip_campaign_details(
+$response = $api->dripCampaignDetails(
     $drip_campaign_id   // string, drip campaign to list details from
 );
 ```
@@ -435,7 +429,7 @@ $response = $api->drip_campaign_details(
 Example
 
 ```php
-$response = $api->drip_campaign_details('dc_1234abcd1234');
+$response = $api->dripCampaignDetails('dc_1234abcd1234');
 ```
 
 Response
@@ -468,7 +462,7 @@ stdClass Object
 
 ### Create Customer
 ```php
-create_customer(
+$response = $api->createCustomer(
     $email,             // string, email of customer
     $data,              // array, optional, data for customer
 )
@@ -477,14 +471,14 @@ create_customer(
 Example
 
 ```php
-$response = $api->create_customer('us@sendwithus.com',
+$response = $api->createCustomer('us@sendwithus.com',
     array('name' => 'Sendwithus')
 );
 ```
 
 ### Update Customer
 ```php
-update_customer(
+$response = $api->updateCustomer(
     $email,             // string, email of customer
     $data,              // array, optional, data for customer
 )
@@ -493,14 +487,14 @@ update_customer(
 Example
 
 ```php
-$response = $api->update_customer('us@sendwithus.com',
+$response = $api->updateCustomer('us@sendwithus.com',
     array('name' => 'Sendwithus.com')
 );
 ```
 
 ### Delete Customer
 ```php
-delete_customer(
+$response = $api->deleteCustomer(
     $email,             // string, email of customer
 )
 ```
@@ -508,7 +502,7 @@ delete_customer(
 Example
 
 ```php
-$response = $api->delete_customer('us@sendwithus.com');
+$response = $api->deleteCustomer('us@sendwithus.com');
 ```
 
 
@@ -543,6 +537,9 @@ print $response->code;
 Make sure to have phpunit installed (http://phpunit.de/) and run the following from the root directory
 
 ```php
-phpunit test
+phpunit --configuration travisci-phpunit.xml
 ```
 
+## Todo:
+
+- Add logger support.

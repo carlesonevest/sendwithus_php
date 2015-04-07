@@ -1,14 +1,15 @@
 <?php
+
+namespace SendWithUsTest\Api;
+
+use SendWithUs\Api\Client;
+
 /**
  * Send With Us PHP Client
  * @author matt@sendwithus.com
  */
 
-require_once(dirname(__FILE__) . '/../lib/API.php');
-require_once(dirname(__FILE__) . '/../lib/Error.php');
-// require_once 'PHPUnit/Autoload.php';
-
-class APITestCase extends PHPUnit_Framework_TestCase
+class ClientTest extends \PHPUnit_Framework_TestCase
 {
     private $API_KEY = 'THIS_IS_A_TEST_API_KEY';
     private $EMAIL_ID = 'test_fixture_1';
@@ -16,6 +17,7 @@ class APITestCase extends PHPUnit_Framework_TestCase
 
     private $options = null;
 
+    /** @var Client */
     private $api = null;
     private $recipient = null;
     private $incompleteRecepient = null;
@@ -24,13 +26,13 @@ class APITestCase extends PHPUnit_Framework_TestCase
     private $cc = null;
     private $bcc = null;
 
-    function setUp() {
-
+    public function setUp()
+    {
         $this->options = array(
-            'DEBUG' => false
+            'debugMode' => false
         );
 
-        $this->api = new \sendwithus\API($this->API_KEY, $this->options);
+        $this->api = new Client($this->API_KEY, $this->options);
 
         $this->good_html = '<html><head></head><body></body></html>';
 
@@ -38,18 +40,22 @@ class APITestCase extends PHPUnit_Framework_TestCase
 
         $this->recipient = array(
             'name' => 'Unit Tests - PHP Client',
-            'address' => 'swunit+phpclient@sendwithus.com');
+            'address' => 'swunit+phpclient@sendwithus.com'
+        );
 
         $this->incompleteRecipient = array(
-            'name' => 'Unit Tests - PHP Client');
+            'name' => 'Unit Tests - PHP Client'
+        );
 
         $this->sender = array(
             'name' => 'Company Name',
             'address' => 'company@example.com',
-            'reply_to' => 'info@example.com');
+            'reply_to' => 'info@example.com'
+        );
 
         $this->data = array(
-            'name' => 'Jimmy the snake');
+            'name' => 'Jimmy the snake'
+        );
 
         $this->cc = array(
             array(
@@ -86,42 +92,49 @@ class APITestCase extends PHPUnit_Framework_TestCase
         $this->log_id = '130be975-dc07-4071-9333-58530e5df052-i03a5q';
     }
 
-    function tearDown() {
-
+    protected function tearDown()
+    {
+        //var_dump(memory_get_usage());
     }
 
-    private function assertSuccess($r) {
-        $this->assertEquals($r->status, "OK");
+    protected function assertSuccess($r)
+    {
+        $this->assertEquals("OK", $r->status);
         $this->assertTrue($r->success);
     }
 
-    private function assertFail($r) {
-        $this->assertNotEquals($r->code, 200);
-        $this->assertEquals($r->status, "error");
+    protected function assertFail($r)
+    {
+        $this->assertNotEquals(200, $r->code);
+        $this->assertEquals("error", $r->status);
         $this->assertFalse($r->success);
         $this->assertNotNull($r->exception);
     }
 
-    public function testGetEmails() {
+    public function testGetEmails()
+    {
         $r = $this->api->emails();
         $this->assertNotNull($r);
         print 'Got emails';
     }
 
-    public function testGetLogs() {
+    public function testGetLogs()
+    {
         $r = $this->api->logs();
         $this->assertNotNull($r);
         print 'Got logs';
     }
 
-    public function testGetSingleLog() {
-        $r = $this->api->get_log($this->log_id);
+    public function testGetSingleLog()
+    {
+        $r = $this->api->getLog($this->log_id);
         $this->assertNotNull($r);
         print 'Getting a log';
     }
 
-    public function testCreateEmailSuccess() {
-        $r = $this->api->create_email(
+    public function testCreateEmailSuccess()
+    {
+        $r = $this->api->createEmail(
             'test name',
             'test subject',
             $this->good_html
@@ -131,30 +144,33 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Created an email';
     }
 
-    public function testCreateNewTemplateVersion(){
-        $r = $this->api->create_new_template_version(
+    public function testCreateNewTemplateVersion()
+    {
+        $r = $this->api->createNewTemplateVersion(
             'test name',
             'test subject',
             $this->template_id,
             $html=$this->good_html
         );
-        $this->assertNotNull($r->created);
+        $this->assertNotNull(isset($r->created) ? $r->created : null);
         print "Created a new template version";
     }
 
-    public function testUpdateTemplateVersion(){
-        $r = $this->api->update_template_version(
+    public function testUpdateTemplateVersion()
+    {
+        $r = $this->api->updateTemplateVersion(
             'test name',
             'test subject',
             $this->template_id,
             $this->version_id,
             $this->good_html
         );
-        $this->assertNotNull($r->created);
+        $this->assertNotNull(isset($r->created) ? $r->created : null);
         print "Updated a template version";
     }
 
-    public function testSimpleSend() {
+    public function testSimpleSend()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->recipient,
@@ -166,7 +182,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Simple send';
     }
 
-    public function testSendWithEmptyData() {
+    public function testSendWithEmptyData()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->recipient,
@@ -178,7 +195,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Send with empty data';
     }
 
-    public function testSendWithNullData() {
+    public function testSendWithNullData()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->recipient,
@@ -190,7 +208,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Send with null data';
     }
 
-    public function testSendWithSender() {
+    public function testSendWithSender()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->recipient,
@@ -205,7 +224,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Simple send with Sender';
     }
 
-    public function testSendWithCC() {
+    public function testSendWithCC()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->recipient,
@@ -220,7 +240,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Simple send with CC';
     }
 
-    public function testSendWithBCC() {
+    public function testSendWithBCC()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->recipient,
@@ -235,7 +256,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Simple send with bcc';
     }
 
-    public function testSendWithInline() {
+    public function testSendWithInline()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->recipient,
@@ -250,7 +272,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Simple send with inline';
     }
 
-    public function testSendWithFiles() {
+    public function testSendWithFiles()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->recipient,
@@ -263,9 +286,10 @@ class APITestCase extends PHPUnit_Framework_TestCase
         $this->assertSuccess($r);
         $this->assertNotNull($r->receipt_id);
         print 'Simple send with file attachments';
-        }
+    }
 
-    public function testSendWithTags() {
+    public function testSendWithTags()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->recipient,
@@ -280,7 +304,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Simple send with tags';
     }
 
-    public function testSendIncomplete() {
+    public function testSendIncomplete()
+    {
         $r = $this->api->send(
             $this->EMAIL_ID,
             $this->incompleteRecipient,
@@ -296,8 +321,9 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Simple bad send';
     }
 
-    public function testInvalidAPIKey() {
-        $api = new \sendwithus\API('INVALID_API_KEY', $this->options);
+    public function testInvalidAPIKey()
+    {
+        $api = new Client('INVALID_API_KEY', $this->options);
 
         $r = $api->send(
             $this->EMAIL_ID,
@@ -312,7 +338,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testInvalidEmailId() {
+    public function testInvalidEmailId()
+    {
         $r = $this->api->send(
             'INVALID_EMAIL_ID',
             $this->recipient,
@@ -325,7 +352,8 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Test invalid email id';
     }
 
-    public function testRender() {
+    public function testRender()
+    {
         $r = $this->api->render(
             $this->EMAIL_ID,
             array("data" => $this->data)
@@ -336,8 +364,9 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Test render';
     }
 
-    public function testCreateCustomer() {
-        $r = $this->api->create_customer(
+    public function testCreateCustomer()
+    {
+        $r = $this->api->createCustomer(
             $this->recipient['address'],
             array("data" => $this->data)
         );
@@ -346,13 +375,14 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Test create customer';
     }
 
-    public function testGetCustomer() {
-        $r = $this->api->create_customer(
+    public function testGetCustomer()
+    {
+        $r = $this->api->createCustomer(
             $this->recipient['address'],
             array("data" => $this->data)
         );
         $this->assertSuccess($r);
-        $r = $this->api->get_customer(
+        $r = $this->api->getCustomer(
             $this->recipient['address']
         );
         $this->assertSuccess($r);
@@ -360,8 +390,9 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Test get customer';
     }
 
-    public function testUpdateCustomer() {
-        $r = $this->api->update_customer(
+    public function testUpdateCustomer()
+    {
+        $r = $this->api->updateCustomer(
             $this->recipient['address'],
             array("data" => $this->data)
         );
@@ -370,123 +401,133 @@ class APITestCase extends PHPUnit_Framework_TestCase
         print 'Test update customer';
     }
 
-    public function testDeleteCustomer() {
-        $r = $this->api->create_customer($this->recipient['address']);
+    public function testDeleteCustomer()
+    {
+        $r = $this->api->createCustomer($this->recipient['address']);
         $this->assertSuccess($r);
 
-        $r = $this->api->delete_customer($this->recipient['address']);
+        $r = $this->api->deleteCustomer($this->recipient['address']);
         $this->assertSuccess($r);
 
         print 'Test delete customer';
     }
 
-    public function testCustomerConversion() {
-        $r = $this->api->customer_conversion($this->recipient['address']);
+    public function testCustomerConversion()
+    {
+        $r = $this->api->customerConversion($this->recipient['address']);
         $this->assertSuccess($r);
 
         print 'Test customer conversion';
     }
 
-    public function testCustomerConversionRevenue() {
-        $r = $this->api->customer_conversion($this->recipient['address'], 1234);
+    public function testCustomerConversionRevenue()
+    {
+        $r = $this->api->customerConversion($this->recipient['address'], 1234);
         $this->assertSuccess($r);
 
         print 'Test customer conversion revenue';
     }
 
-    public function testSendSegment() {
-        $r = $this->api->send_segment($this->EMAIL_ID, $this->SEGMENT_ID);
+    public function testSendSegment()
+    {
+        $r = $this->api->sendSegment($this->EMAIL_ID, $this->SEGMENT_ID);
         $this->assertSuccess($r);
 
         print 'Test send segment';
     }
 
-    public function testListDripCampaigns(){
-        $r = $this->api->list_drip_campaigns();
+    public function testListDripCampaigns()
+    {
+        $r = $this->api->listDripCampaigns();
         $this->assertNotNull($r);
 
         print 'Test list drip campaigns';
     }
 
-    public function testListDripCampaignDetails(){
-        $r = $this->api->drip_campaign_details($this->enabled_drip_campaign_id);
+    public function testListDripCampaignDetails()
+    {
+        $r = $this->api->dripCampaignDetails($this->enabled_drip_campaign_id);
 
-        $this->assertEquals($r->name, 'TEST_CAMPAIGN');
+        $this->assertEquals('TEST_CAMPAIGN', isset($r->name) ? $r->name : null);
 
         print 'Test list drip campaign details';
     }
 
-    public function testStartOnEnabledDripCampaign(){
-        $r = $this->api->drip_campaign_details($this->enabled_drip_campaign_id);
-        $this->assertTrue($r->enabled);
+    public function testStartOnEnabledDripCampaign()
+    {
+        $r = $this->api->dripCampaignDetails($this->enabled_drip_campaign_id);
+        $this->assertTrue(isset($r->enabled) ? $r->enabled : null);
 
-        $r = $this->api->start_on_drip_campaign('person@example.com',$this->enabled_drip_campaign_id);
+        $r = $this->api->startOnDripCampaign('person@example.com', $this->enabled_drip_campaign_id);
         $this->assertSuccess($r);
 
         print 'Test add to enabled drip campaigns';
     }
 
-    public function testStartOnEnabledDripCampaignWithData(){
-        $r = $this->api->drip_campaign_details($this->enabled_drip_campaign_id);
-        $this->assertTrue($r->enabled);
+    public function testStartOnEnabledDripCampaignWithData()
+    {
+        $r = $this->api->dripCampaignDetails($this->enabled_drip_campaign_id);
+        $this->assertTrue(isset($r->enabled) ? $r->enabled : null);
 
-        $r = $this->api->start_on_drip_campaign('person@example.com',$this->enabled_drip_campaign_id, $this->data);
+        $r = $this->api->startOnDripCampaign('person@example.com', $this->enabled_drip_campaign_id, $this->data);
         $this->assertSuccess($r);
 
         print 'Test add to enabled drip campaigns with data';
     }
 
-    public function testStartOnDisabledDripCampaign(){
-        $r = $this->api->drip_campaign_details($this->disabled_drip_campaign_id);
-        $this->assertFalse($r->enabled);
+    public function testStartOnDisabledDripCampaign()
+    {
+        $r = $this->api->dripCampaignDetails($this->disabled_drip_campaign_id);
+        $this->assertFalse(isset($r->enabled) ? $r->enabled : null);
 
-        $r = $this->api->start_on_drip_campaign('person@example.com',$this->disabled_drip_campaign_id);
+        $r = $this->api->startOnDripCampaign('person@example.com', $this->disabled_drip_campaign_id);
         $this->assertFail($r);
 
         print 'Test add to disabled drip campaigns';
     }
 
-    public function testStartOnFalseDripCampaign(){
-        $r = $this->api->drip_campaign_details($this->false_drip_campaign_id);
+    public function testStartOnFalseDripCampaign()
+    {
+        $r = $this->api->dripCampaignDetails($this->false_drip_campaign_id);
         $this->assertFail($r);
 
-        $r = $this->api->start_on_drip_campaign('person@example.com',$this->false_drip_campaign_id);
+        $r = $this->api->startOnDripCampaign('person@example.com', $this->false_drip_campaign_id);
         $this->assertFail($r);
 
         print 'Test add to false drip campaigns';
     }
 
-    public function testListCustomersOnCampaign(){
-        $r = $this->api->list_drip_campaign_customers($this->enabled_drip_campaign_id);
+    public function testListCustomersOnCampaign()
+    {
+        $r = $this->api->listDripCampaignCustomers($this->enabled_drip_campaign_id);
 
-        $this->assertEquals($r->id, $this->enabled_drip_campaign_id);
+        $this->assertEquals($this->enabled_drip_campaign_id, isset($r->id) ? $r->id : null);
 
         print 'Test list customers on drip campaign';
     }
 
-    public function testListCustomersOnCampaignStep(){
-        $r = $this->api->list_drip_campaign_step_customers($this->enabled_drip_campaign_id, $this->enabled_drip_campaign_step_id);
+    public function testListCustomersOnCampaignStep()
+    {
+        $r = $this->api->listDripCampaignStepCustomers($this->enabled_drip_campaign_id, $this->enabled_drip_campaign_step_id);
 
-        $this->assertEquals($r->id, $this->enabled_drip_campaign_step_id);
+        $this->assertEquals($this->enabled_drip_campaign_step_id, isset($r->id) ? $r->id : null);
 
         print 'Test list customers on a drip campaign step';
     }
 
-    public function testRemoveOnDripCampaign(){
-        $r = $this->api->remove_from_drip_campaign('person@example.com',$this->enabled_drip_campaign_id);
+    public function testRemoveOnDripCampaign()
+    {
+        $r = $this->api->removeFromDripCampaign('person@example.com', $this->enabled_drip_campaign_id);
         $this->assertSuccess($r);
 
         print 'Test remove from drip campaigns';
     }
 
-    public function testListDripCampaignSteps(){
-        $r = $this->api->drip_campaign_details($this->enabled_drip_campaign_id);
+    public function testListDripCampaignSteps()
+    {
+        $r = $this->api->dripCampaignDetails($this->enabled_drip_campaign_id);
 
-        $this->assertEquals($r->name, 'TEST_CAMPAIGN');
+        $this->assertEquals('TEST_CAMPAIGN', isset($r->name) ? $r->name : null);
         print 'Test list drip campaign steps';
     }
-
-
 }
-
-?>

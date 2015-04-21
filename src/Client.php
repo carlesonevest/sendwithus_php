@@ -2,6 +2,7 @@
 
 namespace SendWithUs\Api;
 
+use Monolog\Logger;
 use SendWithUs\Api\Exception\ApiException;
 
 class Client
@@ -21,6 +22,7 @@ class Client
     protected $apiClientVersion = '2.3.1';
     protected $apiClientStub = 'php-%s';
 
+    /** @var Logger|null */
     protected $logger = null;
 
     protected $debugMode = false;
@@ -28,8 +30,9 @@ class Client
     /**
      * @param string $apiKey
      * @param array $options
+     * @param Logger|null $logger
      */
-    public function __construct($apiKey, $options = array())
+    public function __construct($apiKey, $options = array(), Logger $logger = null)
     {
         $this->apiKey = $apiKey;
         $this->apiClientStub = sprintf($this->apiClientStub, $this->apiClientVersion);
@@ -37,6 +40,8 @@ class Client
         foreach ($options as $key => $value) {
             $this->$key = $value;
         }
+
+        $this->logger = $logger;
     }
 
     /**
@@ -616,7 +621,7 @@ class Client
         try {
             $result = curl_exec($ch);
             $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $response = json_decode($result);
+            $response = json_decode($result, true);
 
             if ($code != 200) {
                 throw new ApiException('Request was not successful', $code, $result, $response);
@@ -656,9 +661,13 @@ class Client
         $args = func_get_args();
         $message = array_shift($args);
         $vars = $args;
-
         $output = vsprintf($message, $vars);
 
-        error_log($output);
+        if ($this->logger instanceof Logger) {
+            $this->logger->addInfo($output);
+
+        } else {
+            error_log($output);
+        }
     }
 }

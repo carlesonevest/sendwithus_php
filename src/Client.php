@@ -631,7 +631,7 @@ class Client
             $this->log("Caught exception: %s\r\n", $e->getMessage());
             //$this->log(print_r($e, true));
 
-            $response = (object) array(
+            $response = array(
                 'code' => $code,
                 'status' => 'error',
                 'success' => false,

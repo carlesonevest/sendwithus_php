@@ -19,7 +19,7 @@ class Client
     protected $apiVersion = '1';
     protected $apiHeaderKey = 'X-SWU-API-KEY';
     protected $apiHeaderClient = 'X-SWU-API-CLIENT';
-    protected $apiClientVersion = '2.3.1';
+    protected $apiClientVersion = '2.4.1';
     protected $apiClientStub = 'php-%s';
 
     /** @var Logger|null */
@@ -56,17 +56,17 @@ class Client
      *     'tags' - Default is null. Array of strings to tag email send with.
      *     'version_name' - Default is blank. String, name of version to send
      *
-     * @param string $email_id ID of email to send
+     * @param string $emailId ID of email to send
      * @param array $recipient array of ('address', 'name') to send to
      * @param array $args (optional) additional optional parameters
      * @return array API response object
      */
-    public function send($email_id, $recipient, $args = null)
+    public function send($emailId, $recipient, $args = null)
     {
         $endpoint = 'send';
 
         $payload = array(
-            'email_id' => $email_id,
+            'email_id' => $emailId,
             'recipient' => $recipient
         );
 
@@ -94,7 +94,7 @@ class Client
             }
         }
 
-        $this->log("sending email `%s` to \n", $email_id);
+        $this->log("sending email `%s` to \n", $emailId);
         $this->log(print_r($recipient, true));
 
         if (isset($payload['sender'])) {
@@ -139,6 +139,16 @@ class Client
     }
 
     /**
+     * @return array API response object
+     */
+    public function getSegments()
+    {
+        $endpoint = 'segments';
+
+        return $this->apiRequest($endpoint, self::HTTP_GET);
+    }
+
+    /**
      * Send to a Segment
      *
      * @param string $emailId template id
@@ -177,11 +187,12 @@ class Client
      * Create Customer
      *
      * @param string $email customer email
-     * @param array $data customer data to
+     * @param array $data optional customer data
+     * @param array $args optional arguments
      *
      * @return array API response object.
      */
-    public function createCustomer($email, $data = null)
+    public function createCustomer($email, $data = null, $args = null)
     {
         $endpoint = 'customers';
         $payload = array('email' => $email);
@@ -189,6 +200,11 @@ class Client
         if (is_array($data)) {
             $payload['data'] = $data;
         }
+
+        if (is_array($args)) {
+            $payload = array_merge($args, $payload);
+        }
+
 
         return $this->apiRequest($endpoint, self::HTTP_POST, $payload);
     }
@@ -234,6 +250,48 @@ class Client
         $payload = array('revenue' => $revenue);
 
         return $this->apiRequest($endpoint, self::HTTP_POST, $payload);
+    }
+
+    /**
+     * Add Customer to a Group
+     *
+     * @param string $email customer email
+     * @param string $groupId ID of group
+     *
+     * @return array API response object
+     */
+    public function addCustomerToGroup($email, $groupId)
+    {
+        $endpoint = 'customers/' . $email . '/groups/' . $groupId;
+
+        return $this->apiRequest($endpoint, self::HTTP_POST);
+    }
+
+    /**
+     * Remove Customer from a Group
+     *
+     * @param string $email customer email
+     * @param string $groupId ID of group
+     *
+     * @return array API response object
+     */
+    public function removeCustomerFromGroup($email, $groupId)
+    {
+        $endpoint = 'customers/' . $email . '/groups/' . $groupId;
+
+        return $this->apiRequest($endpoint, self::HTTP_POST);
+    }
+
+    /**
+     * Get all Customer Groups
+     *
+     * @return array API response object.
+     */
+    public function listGroups()
+    {
+        $endpoint = 'groups';
+
+        return $this->apiRequest($endpoint, self::HTTP_GET);
     }
 
     /**
@@ -506,23 +564,23 @@ class Client
      * The additional optional parameters are as follows:
      *     'template_data' - Default is null. Array of variables to merge into the template.
      *
-     * @param string $email_id ID of email to send
+     * @param string $emailId ID of email to send
      * @param array $args (optional) additional optional parameters
      * @return array API response object
      */
-    public function render($email_id, $args = null)
+    public function render($emailId, $args = null)
     {
         $endpoint = 'render';
 
         $payload = array(
-            'template_id' => $email_id
+            'template_id' => $emailId
         );
 
         if (is_array($args)) {
             $payload = array_merge($args, $payload);
         }
 
-        $this->log("rendering template `%s` with \n", $email_id);
+        $this->log("rendering template `%s` with \n", $emailId);
         $this->log(print_r($payload, true));
 
         return $this->apiRequest($endpoint, self::HTTP_POST, $payload);

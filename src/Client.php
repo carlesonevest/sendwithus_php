@@ -66,7 +66,7 @@ class Client
         $endpoint = 'send';
 
         $payload = array(
-            'email_id' => $emailId,
+            'template' => $emailId,
             'recipient' => $recipient
         );
 
